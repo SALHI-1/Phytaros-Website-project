@@ -6,29 +6,43 @@ import { ArrowRight, Clock, MessageCircle, Truck } from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
 import { SITE_CONFIG } from "@/config/site";
 
-const SLIDE_DURATION_MS = 6000;
+const SLIDE_DURATION_MS = 5000;
 
 const HERO_SLIDES = [
   {
-    id: "balcony",
-    src: "/images/hero-balcony.jpg",
-    alt: "Phytaros modular hydroponic tower growing fresh herbs on a sunlit Mediterranean balcony",
-    mobilePosition: "object-[92%_center]",
-    desktopPosition: "object-[76%_center]",
+    id: "balcony-herbs",
+    src: "/images/345862446407460503.jpeg",
+    alt: "Hydroponic herb tower on a sunlit urban balcony",
+    objectPosition: "object-[center_42%]",
+    cropBottom: false,
   },
   {
-    id: "terrace",
-    src: "/images/hero-terrace.jpg",
-    alt: "Phytaros Mini and Phytaros Tower growing greens and cherry tomatoes on a twilight rooftop terrace",
-    mobilePosition: "object-[88%_center]",
-    desktopPosition: "object-[74%_center]",
+    id: "greenhouse-row",
+    src: "/images/718816790570082184.jpeg",
+    alt: "Row of modular white hydroponic towers growing crisp lettuce in a bright greenhouse",
+    objectPosition: "object-[center_30%]",
+    cropBottom: true,
   },
   {
-    id: "studio",
-    src: "/images/hero-studio.jpg",
-    alt: "Studio photograph of the Phytaros modular polypropylene hydroponic tower with fresh basil",
-    mobilePosition: "object-[90%_center]",
-    desktopPosition: "object-[75%_center]",
+    id: "lush-lettuce",
+    src: "/images/Goût des Cultures Aéroponiques _ Saveur des Légumes Hydroponiques.jpeg",
+    alt: "Vertical hydroponic tower overflowing with fresh curly green lettuce",
+    objectPosition: "object-[center_46%]",
+    cropBottom: false,
+  },
+  {
+    id: "outdoor-park",
+    src: "/images/Indoor Oasis.jpeg",
+    alt: "Outdoor vertical farm park of hydroponic towers at sunset",
+    objectPosition: "object-[center_62%]",
+    cropBottom: false,
+  },
+  {
+    id: "leafy-closeup",
+    src: "/images/What is Tower Garden Made From_ _ Tower Garden Plastic.jpeg",
+    alt: "Close-up of vibrant green and purple leafy greens growing on white hydroponic towers",
+    objectPosition: "object-center",
+    cropBottom: false,
   },
 ] as const;
 
@@ -68,11 +82,11 @@ export function HeroCarousel() {
       aria-label="Phytaros hero showcase"
       className="relative bg-forest text-on-forest overflow-hidden md:min-h-[660px] lg:min-h-[740px] flex flex-col justify-center"
     >
-      {/* MOBILE VISUAL STAGE (< md): Pure images only, smooth crossfade */}
+      {/* MOBILE VISUAL STAGE (< md): Pure images, natural portrait proportion */}
       <div
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
-        className="relative md:hidden h-[290px] sm:h-[370px] w-full overflow-hidden bg-forest"
+        className="relative md:hidden h-[340px] sm:h-[420px] w-full overflow-hidden bg-forest"
       >
         {HERO_SLIDES.map((slide, idx) => {
           const isActive = idx === activeIndex;
@@ -80,7 +94,9 @@ export function HeroCarousel() {
             <div
               key={`mobile-${slide.id}`}
               aria-hidden={!isActive}
-              className={`absolute inset-0 transition-opacity duration-700 ease-in-out will-change-[opacity] ${
+              className={`absolute inset-x-0 top-0 ${
+                slide.cropBottom ? "-bottom-8" : "bottom-0"
+              } transition-opacity duration-700 ease-in-out will-change-[opacity] ${
                 isActive ? "opacity-100 z-[1]" : "opacity-0 z-0"
               }`}
             >
@@ -88,9 +104,9 @@ export function HeroCarousel() {
                 src={slide.src}
                 alt={slide.alt}
                 fill
-                priority
+                priority={idx === 0}
                 sizes="100vw"
-                className={`object-cover ${slide.mobilePosition} select-none`}
+                className={`object-cover ${slide.objectPosition} select-none`}
               />
             </div>
           );
@@ -99,13 +115,13 @@ export function HeroCarousel() {
         {/* Soft bottom melt into the forest copy block */}
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] h-24 bg-gradient-to-t from-forest via-forest/65 to-transparent"
+          className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] h-28 bg-gradient-to-t from-forest via-forest/70 to-transparent"
         />
       </div>
 
-      {/* DESKTOP FULL-BLEED BACKGROUND CAROUSEL (md+): Pure images only */}
+      {/* DESKTOP RIGHT-ALIGNED CAROUSEL (md+): Keeps portrait/square photos crisp without over-zooming */}
       <div
-        className="pointer-events-none hidden md:block absolute inset-0 z-0"
+        className="pointer-events-none hidden md:block absolute inset-y-0 right-0 w-[62%] lg:w-[58%] z-0 overflow-hidden"
         aria-hidden="true"
       >
         {HERO_SLIDES.map((slide, idx) => {
@@ -113,7 +129,9 @@ export function HeroCarousel() {
           return (
             <div
               key={`desktop-${slide.id}`}
-              className={`absolute inset-0 transition-opacity duration-1000 ease-in-out will-change-[opacity] ${
+              className={`absolute inset-x-0 top-0 ${
+                slide.cropBottom ? "-bottom-10" : "bottom-0"
+              } transition-opacity duration-1000 ease-in-out will-change-[opacity] ${
                 isActive ? "opacity-100 z-[1]" : "opacity-0 z-0"
               }`}
             >
@@ -121,27 +139,27 @@ export function HeroCarousel() {
                 src={slide.src}
                 alt={slide.alt}
                 fill
-                priority
-                sizes="100vw"
-                className={`object-cover ${slide.desktopPosition} select-none`}
+                priority={idx === 0}
+                sizes="(min-width: 1024px) 58vw, 62vw"
+                className={`object-cover ${slide.objectPosition} select-none`}
               />
             </div>
           );
         })}
 
-        {/* Directional scrim: deep Obsidian Forest under left text, bright towers on right */}
+        {/* Soft left & vertical feather seamlessly melting images into #0D281E */}
         <div
           className="absolute inset-0 z-[2]"
           style={{
             background:
-              "linear-gradient(90deg, rgba(13,40,30,0.97) 0%, rgba(13,40,30,0.90) 38%, rgba(13,40,30,0.52) 60%, rgba(13,40,30,0.10) 100%)",
+              "linear-gradient(90deg, rgba(13,40,30,1) 0%, rgba(13,40,30,0.88) 16%, rgba(13,40,30,0.38) 42%, rgba(13,40,30,0.12) 100%)",
           }}
         />
         <div
           className="absolute inset-0 z-[2]"
           style={{
             background:
-              "linear-gradient(180deg, rgba(13,40,30,0.40) 0%, rgba(13,40,30,0) 24%, rgba(13,40,30,0) 78%, rgba(13,40,30,0.75) 100%)",
+              "linear-gradient(180deg, rgba(13,40,30,0.35) 0%, rgba(13,40,30,0) 20%, rgba(13,40,30,0) 80%, rgba(13,40,30,0.65) 100%)",
           }}
         />
       </div>
@@ -152,9 +170,9 @@ export function HeroCarousel() {
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-          className="flex max-w-[590px] flex-col gap-4 sm:gap-5 md:gap-6"
+          className="flex max-w-[560px] flex-col gap-4 sm:gap-5 md:gap-6"
         >
-          <span className="inline-flex w-fit items-center gap-2 rounded-full border border-lime/30 bg-forest-raised/80 md:bg-forest/70 backdrop-blur-sm px-3 py-1 text-[11px] leading-4 font-semibold tracking-[0.08em] text-lime uppercase">
+          <span className="inline-flex w-fit items-center gap-2 rounded-full border border-lime/30 bg-forest-raised/85 md:bg-forest/80 backdrop-blur-sm px-3 py-1 text-[11px] leading-4 font-semibold tracking-[0.08em] text-lime uppercase">
             <span
               aria-hidden="true"
               className="h-1.5 w-1.5 rounded-full bg-lime"
@@ -166,7 +184,7 @@ export function HeroCarousel() {
             {SITE_CONFIG.brand.tagline}
           </h1>
 
-          <p className="m-0 max-w-[32em] text-base sm:text-lg leading-relaxed sm:leading-7 text-on-forest/90">
+          <p className="m-0 max-w-[31em] text-base sm:text-lg leading-relaxed sm:leading-7 text-on-forest/90">
             Modular towers that grow herbs, greens and fruit on a balcony, with
             no soil. Start with one tower — and grow toward a whole farm park.
           </p>
@@ -181,7 +199,7 @@ export function HeroCarousel() {
             </a>
             <a
               href="#story"
-              className="inline-flex min-h-[50px] w-full sm:w-auto items-center justify-center rounded-[12px] border border-white/25 bg-forest-raised/60 md:bg-forest/55 backdrop-blur-sm px-6 text-base font-semibold text-on-forest hover:border-white/50 hover:bg-forest-raised transition-colors no-underline"
+              className="inline-flex min-h-[50px] w-full sm:w-auto items-center justify-center rounded-[12px] border border-white/25 bg-forest-raised/70 md:bg-forest/65 backdrop-blur-sm px-6 text-base font-semibold text-on-forest hover:border-white/50 hover:bg-forest-raised transition-colors no-underline"
             >
               Read our story
             </a>
