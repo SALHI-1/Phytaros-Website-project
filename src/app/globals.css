@@ -1,0 +1,107 @@
+@import "tailwindcss";
+
+:root {
+  /* Phytaros Design Tokens — Option A: Botanical Precision */
+  --ground: #f7f6f1;
+  --surface-raised: #ffffff;
+  --surface-sunk: #eceae0;
+  --ink: #0f2018;
+  --ink-muted: #4b5c53;
+  --line: #dbd9cc;
+  --line-strong: #878c80;
+
+  --forest: #0d281e;
+  --forest-raised: #14372a;
+  --forest-block: #235844;
+  --on-forest: #eef5e8;
+  --on-forest-muted: #a4bfb0;
+
+  --lime: #b6ec3d;
+  --lime-hover: #a5de2d;
+  --on-lime: #0f2018;
+  --lime-ink: #35630a;
+
+  --water: #1a7888;
+  --water-bright: #5ec6d6;
+  --on-water: #ffffff;
+
+  --leaf-soft: #dfedd0;
+  --terracotta: #c86d4b;
+  --terracotta-soft: #f5e6df;
+
+  --danger: #b3261e;
+  --focus: #1a7888;
+
+  --shadow-card: 0 1px 2px rgba(13, 40, 30, 0.05), 0 12px 32px -4px rgba(13, 40, 30, 0.09);
+  --shadow-card-hover: 0 4px 12px rgba(13, 40, 30, 0.08), 0 20px 40px -8px rgba(13, 40, 30, 0.14);
+}
+
+@theme inline {
+  --color-ground: var(--ground);
+  --color-surface-raised: var(--surface-raised);
+  --color-surface-sunk: var(--surface-sunk);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-forest: var(--forest);
+  --color-forest-raised: var(--forest-raised);
+  --color-forest-block: var(--forest-block);
+  --color-on-forest: var(--on-forest);
+  --color-on-forest-muted: var(--on-forest-muted);
+  --color-lime: var(--lime);
+  --color-lime-hover: var(--lime-hover);
+  --color-on-lime: var(--on-lime);
+  --color-lime-ink: var(--lime-ink);
+  --color-water: var(--water);
+  --color-water-bright: var(--water-bright);
+  --color-on-water: var(--on-water);
+  --color-leaf-soft: var(--leaf-soft);
+  --color-terracotta: var(--terracotta);
+  --color-terracotta-soft: var(--terracotta-soft);
+  --color-danger: var(--danger);
+  --color-focus: var(--focus);
+
+  --font-display: var(--font-bricolage), "Bricolage Grotesque", "Arial Narrow", system-ui, sans-serif;
+  --font-sans: var(--font-instrument), "Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: var(--font-jetbrains), "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+
+  --shadow-card: var(--shadow-card);
+  --shadow-card-hover: var(--shadow-card-hover);
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 84px;
+  overflow-x: clip;
+  background-color: var(--ground);
+  color: var(--ink);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+body {
+  margin: 0;
+  overflow-x: clip;
+  background-color: var(--ground);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 24px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+*:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+::selection {
+  background-color: var(--lime);
+  color: var(--on-lime);
+}
