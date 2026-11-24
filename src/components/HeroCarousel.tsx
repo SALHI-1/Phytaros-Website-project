@@ -172,11 +172,7 @@ export function HeroCarousel() {
           transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
           className="flex max-w-[560px] flex-col gap-4 sm:gap-5 md:gap-6"
         >
-          <span className="inline-flex w-fit items-center gap-2 rounded-full border border-lime/30 bg-forest-raised/85 md:bg-forest/80 backdrop-blur-sm px-3 py-1 text-[11px] leading-4 font-semibold tracking-[0.08em] text-lime uppercase">
-            <span
-              aria-hidden="true"
-              className="h-1.5 w-1.5 rounded-full bg-lime"
-            />
+          <span className="inline-flex w-fit items-center rounded-full border border-lime/30 bg-forest-raised/85 md:bg-forest/80 backdrop-blur-sm px-3.5 py-1 text-[11px] leading-4 font-semibold tracking-[0.08em] text-lime uppercase">
             Hydroponic towers · Made in Tangier
           </span>
 
@@ -192,7 +188,7 @@ export function HeroCarousel() {
           <div className="flex flex-col sm:flex-row gap-3 pt-1">
             <a
               href="#catalog"
-              className="inline-flex min-h-[50px] w-full sm:w-auto items-center justify-center gap-2 rounded-[12px] bg-lime border border-lime px-6 text-base font-semibold text-on-lime hover:bg-lime-hover active:scale-[0.98] transition-all no-underline shadow-[0_8px_24px_rgba(182,236,61,0.3)]"
+              className="inline-flex min-h-[50px] w-full sm:w-auto items-center justify-center gap-2 rounded-[12px] bg-lime border border-lime px-6 text-base font-semibold text-on-lime hover:bg-lime-hover active:scale-[0.98] transition-all no-underline"
             >
               Choose your tower
               <ArrowRight className="h-4 w-4" aria-hidden="true" />

@@ -157,7 +157,7 @@ export function Header() {
 
             <a
               href="#catalog"
-              className="inline-flex min-h-[44px] items-center rounded-[12px] bg-lime px-5 text-[15px] font-semibold text-on-lime hover:bg-lime-hover active:scale-[0.98] transition-all no-underline shadow-[0_4px_16px_rgba(182,236,61,0.25)]"
+              className="inline-flex min-h-[44px] items-center rounded-[12px] bg-lime px-5 text-[15px] font-semibold text-on-lime hover:bg-lime-hover active:scale-[0.98] transition-all no-underline"
             >
               Pre-order
             </a>
@@ -351,7 +351,7 @@ export function Header() {
             <button
               type="button"
               onClick={openCart}
-              className="flex w-full items-center justify-between rounded-[16px] bg-forest border border-lime/35 px-4 py-3.5 text-on-forest shadow-[0_12px_32px_rgba(13,40,30,0.35)] cursor-pointer active:scale-[0.99] transition-transform"
+              className="flex w-full items-center justify-between rounded-[16px] bg-forest border border-lime/40 px-4 py-3.5 text-on-forest cursor-pointer active:scale-[0.99] transition-transform"
             >
               <span className="flex items-center gap-2.5 text-sm font-semibold">
                 <span className="inline-flex h-6 min-w-6 items-center justify-center rounded-full bg-lime px-1.5 font-mono text-xs font-bold text-on-lime">

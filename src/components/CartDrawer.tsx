@@ -687,7 +687,7 @@ export function CartDrawer() {
                   <button
                     type="button"
                     onClick={() => setStep("checkout")}
-                    className="inline-flex min-h-[50px] w-full items-center justify-center gap-2 rounded-[12px] bg-lime px-6 text-base font-semibold text-on-lime hover:bg-lime-hover active:scale-[0.98] transition-all cursor-pointer shadow-[0_6px_18px_rgba(182,236,61,0.28)]"
+                    className="inline-flex min-h-[50px] w-full items-center justify-center gap-2 rounded-[12px] bg-lime px-6 text-base font-semibold text-on-lime hover:bg-lime-hover active:scale-[0.98] transition-all cursor-pointer"
                   >
                     Continue to pre-order
                     <ArrowRight className="h-4 w-4" aria-hidden="true" />
@@ -700,7 +700,7 @@ export function CartDrawer() {
                   type="submit"
                   form="preorder-checkout-form"
                   disabled={submitting}
-                  className="inline-flex min-h-[50px] w-full items-center justify-center gap-2 rounded-[12px] bg-lime px-6 text-base font-semibold text-on-lime hover:bg-lime-hover active:scale-[0.98] disabled:opacity-60 transition-all cursor-pointer shadow-[0_6px_18px_rgba(182,236,61,0.28)]"
+                  className="inline-flex min-h-[50px] w-full items-center justify-center gap-2 rounded-[12px] bg-lime px-6 text-base font-semibold text-on-lime hover:bg-lime-hover active:scale-[0.98] disabled:opacity-60 transition-all cursor-pointer"
                 >
                   {submitting ? (
                     <>

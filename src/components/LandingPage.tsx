@@ -3,10 +3,16 @@
 import { useState } from "react";
 import {
   ArrowRight,
+  ArrowUp,
+  ArrowUpRight,
   Check,
   Clock,
   Droplets,
+  Instagram,
   Leaf,
+  Mail,
+  MapPin,
+  Phone,
   ShieldCheck,
   ShoppingBag,
   Sparkles,
@@ -69,7 +75,7 @@ function SectionEyebrow({
 }) {
   return (
     <span
-      className={`inline-flex w-fit items-center gap-2 rounded-full border px-3 py-1 text-[11px] leading-4 font-semibold tracking-[0.08em] uppercase ${
+      className={`inline-flex w-fit items-center rounded-full border px-3.5 py-1 text-[11px] leading-4 font-semibold tracking-[0.08em] uppercase ${
         dark
           ? "border-lime/25 bg-white/5 text-lime"
           : terracotta
@@ -77,12 +83,6 @@ function SectionEyebrow({
             : "border-line bg-surface-raised/80 text-lime-ink"
       }`}
     >
-      <span
-        aria-hidden="true"
-        className={`h-1.5 w-1.5 rounded-full ${
-          dark ? "bg-lime" : terracotta ? "bg-terracotta" : "bg-lime-ink"
-        }`}
-      />
       {children}
     </span>
   );
@@ -410,7 +410,7 @@ export function LandingPage() {
                             onClick={() => handleAddToCart(product.id)}
                             className={`inline-flex min-h-[48px] flex-1 sm:flex-none items-center justify-center gap-2 rounded-[12px] px-5 sm:px-6 text-base font-semibold active:scale-[0.98] transition-all cursor-pointer ${
                               product.popular
-                                ? "bg-lime border border-lime text-on-lime hover:bg-lime-hover shadow-[0_6px_18px_rgba(182,236,61,0.3)]"
+                                ? "bg-lime border border-lime text-on-lime hover:bg-lime-hover"
                                 : "bg-forest border border-forest text-on-forest hover:bg-forest-raised"
                             }`}
                           >
@@ -577,7 +577,7 @@ export function LandingPage() {
               <button
                 type="button"
                 onClick={() => openInquiry("smartcap-waitlist")}
-                className="inline-flex min-h-[50px] w-full sm:w-auto items-center justify-center gap-2 rounded-[12px] bg-lime border border-lime px-6 text-base font-semibold text-on-lime hover:bg-lime-hover active:scale-[0.98] transition-all cursor-pointer shadow-[0_8px_24px_rgba(182,236,61,0.22)]"
+                className="inline-flex min-h-[50px] w-full sm:w-auto items-center justify-center gap-2 rounded-[12px] bg-lime border border-lime px-6 text-base font-semibold text-on-lime hover:bg-lime-hover active:scale-[0.98] transition-all cursor-pointer"
               >
                 Join the SmartCap waitlist
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
@@ -874,7 +874,7 @@ export function LandingPage() {
           <div className="flex flex-col sm:flex-row gap-3">
             <a
               href="#catalog"
-              className="inline-flex min-h-[50px] w-full sm:w-auto items-center justify-center gap-2 rounded-[12px] bg-lime border border-lime px-6 text-base font-semibold text-on-lime hover:bg-lime-hover active:scale-[0.98] transition-all no-underline shadow-[0_8px_24px_rgba(182,236,61,0.25)]"
+              className="inline-flex min-h-[50px] w-full sm:w-auto items-center justify-center gap-2 rounded-[12px] bg-lime border border-lime px-6 text-base font-semibold text-on-lime hover:bg-lime-hover active:scale-[0.98] transition-all no-underline"
             >
               Choose your tower
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
@@ -891,52 +891,168 @@ export function LandingPage() {
       </section>
 
       {/* FOOTER */}
-      <footer className="bg-surface-sunk border-t border-line px-4 sm:px-8 pt-10 pb-24 md:pb-12 sm:py-12">
-        <div className="mx-auto flex max-w-[1136px] flex-col sm:flex-row sm:items-start sm:justify-between gap-8">
-          <div className="flex flex-col gap-2.5">
-            <a
-              href="#top"
-              className="flex items-center font-display text-2xl font-bold text-ink no-underline"
-            >
-              {SITE_CONFIG.brand.name}
-            </a>
-            <p className="m-0 text-sm leading-relaxed text-ink-muted">
-              {SITE_CONFIG.brand.shortDescription}
-            </p>
-          </div>
-
-          <div className="grid grid-cols-2 gap-6 sm:flex sm:flex-wrap sm:gap-12">
-            <div className="flex flex-col gap-1.5 sm:gap-2">
-              <p className="m-0 text-xs leading-4 font-semibold tracking-[0.08em] text-ink-muted uppercase">
-                VISIT
+      <footer className="bg-forest text-on-forest border-t border-white/10 px-4 sm:px-8 pt-14 pb-24 md:pb-12">
+        <div className="mx-auto max-w-[1136px]">
+          <div className="grid grid-cols-1 gap-10 pb-12 border-b border-white/10 sm:grid-cols-2 lg:grid-cols-12">
+            {/* Brand column */}
+            <div className="flex flex-col gap-4 sm:col-span-2 lg:col-span-4">
+              <a
+                href="#top"
+                className="w-fit font-display text-2xl font-bold tracking-tight text-on-forest no-underline hover:text-lime transition-colors"
+              >
+                {SITE_CONFIG.brand.name}
+              </a>
+              <p className="m-0 max-w-sm text-sm leading-relaxed text-on-forest-muted">
+                Modular hydroponic towers engineered in Tangier. Grow fresh
+                herbs, greens, and fruit upward with no soil and up to 90% less
+                water.
               </p>
-              {SITE_CONFIG.brand.locations.map((loc) => (
-                <p key={loc} className="m-0 text-sm text-ink">
-                  {loc}
-                </p>
-              ))}
+              <div className="flex flex-wrap gap-2 pt-1">
+                <span className="rounded-full border border-white/15 bg-forest-raised px-3 py-1 font-mono text-[11px] text-on-forest/90">
+                  Made in Tangier
+                </span>
+                <span className="rounded-full border border-white/15 bg-forest-raised px-3 py-1 font-mono text-[11px] text-on-forest/90">
+                  Delivery included
+                </span>
+                <span className="rounded-full border border-white/15 bg-forest-raised px-3 py-1 font-mono text-[11px] text-lime">
+                  Pay on delivery
+                </span>
+              </div>
             </div>
 
-            <div className="flex flex-col gap-1.5 sm:gap-2">
-              <p className="m-0 text-xs leading-4 font-semibold tracking-[0.08em] text-ink-muted uppercase">
-                CONTACT
+            {/* Explore links */}
+            <div className="flex flex-col gap-3 lg:col-span-2 lg:col-start-6">
+              <p className="m-0 font-mono text-[11px] font-semibold tracking-[0.1em] text-lime uppercase">
+                Explore
               </p>
-              <a
-                href={`mailto:${SITE_CONFIG.contact.email}`}
-                className="text-sm text-ink hover:text-lime-ink no-underline break-all"
-              >
-                {SITE_CONFIG.contact.email}
-              </a>
-              <p className="m-0 text-sm text-ink">
-                {SITE_CONFIG.contact.phoneDisplay}
+              <ul className="m-0 flex list-none flex-col gap-2.5 p-0 text-sm">
+                {SITE_CONFIG.navigation.map((item) => (
+                  <li key={item.href}>
+                    <a
+                      href={item.href}
+                      className="text-on-forest-muted hover:text-on-forest transition-colors no-underline"
+                    >
+                      {item.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Products & actions */}
+            <div className="flex flex-col gap-3 lg:col-span-3">
+              <p className="m-0 font-mono text-[11px] font-semibold tracking-[0.1em] text-lime uppercase">
+                Pre-order &amp; Services
               </p>
+              <ul className="m-0 flex list-none flex-col gap-2.5 p-0 text-sm">
+                {SITE_CONFIG.products.map((product) => (
+                  <li key={product.id}>
+                    <a
+                      href="#catalog"
+                      className="inline-flex items-center gap-2 text-on-forest-muted hover:text-on-forest transition-colors no-underline"
+                    >
+                      <span>{product.name}</span>
+                      <span className="font-mono text-[11px] text-on-forest-muted/70">
+                        {product.blocks} blocks
+                      </span>
+                    </a>
+                  </li>
+                ))}
+                <li>
+                  <button
+                    type="button"
+                    onClick={() => openInquiry("smartcap-waitlist")}
+                    className="bg-transparent border-0 p-0 text-left text-sm text-on-forest-muted hover:text-lime transition-colors cursor-pointer"
+                  >
+                    SmartCap waitlist
+                  </button>
+                </li>
+                <li>
+                  <button
+                    type="button"
+                    onClick={() => openInquiry("farming-as-a-service")}
+                    className="bg-transparent border-0 p-0 text-left text-sm text-on-forest-muted hover:text-lime transition-colors cursor-pointer"
+                  >
+                    Farming-as-a-Service
+                  </button>
+                </li>
+                <li>
+                  <button
+                    type="button"
+                    onClick={openCart}
+                    className="bg-transparent border-0 p-0 text-left text-sm font-medium text-lime hover:underline cursor-pointer"
+                  >
+                    Open pre-order cart
+                  </button>
+                </li>
+              </ul>
+            </div>
+
+            {/* Studios & Contact */}
+            <div className="flex flex-col gap-3 lg:col-span-2">
+              <p className="m-0 font-mono text-[11px] font-semibold tracking-[0.1em] text-lime uppercase">
+                Connect
+              </p>
+              <div className="flex flex-col gap-2.5 text-sm text-on-forest-muted">
+                {SITE_CONFIG.brand.locations.map((loc) => (
+                  <span key={loc} className="inline-flex items-center gap-2">
+                    <MapPin
+                      className="h-3.5 w-3.5 shrink-0 text-lime/80"
+                      aria-hidden="true"
+                    />
+                    <span>{loc}</span>
+                  </span>
+                ))}
+                <a
+                  href={`mailto:${SITE_CONFIG.contact.email}`}
+                  className="inline-flex items-center gap-2 text-on-forest-muted hover:text-on-forest transition-colors no-underline break-all"
+                >
+                  <Mail
+                    className="h-3.5 w-3.5 shrink-0 text-lime/80"
+                    aria-hidden="true"
+                  />
+                  <span>{SITE_CONFIG.contact.email}</span>
+                </a>
+                <span className="inline-flex items-center gap-2">
+                  <Phone
+                    className="h-3.5 w-3.5 shrink-0 text-lime/80"
+                    aria-hidden="true"
+                  />
+                  <span>{SITE_CONFIG.contact.phoneDisplay}</span>
+                </span>
+                <a
+                  href={SITE_CONFIG.contact.instagramUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 text-on-forest-muted hover:text-lime transition-colors no-underline"
+                >
+                  <Instagram
+                    className="h-3.5 w-3.5 shrink-0 text-lime/80"
+                    aria-hidden="true"
+                  />
+                  <span>{SITE_CONFIG.contact.instagramHandle}</span>
+                  <ArrowUpRight className="h-3 w-3" aria-hidden="true" />
+                </a>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom bar */}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-6 text-xs text-on-forest-muted">
+            <p className="m-0">
+              &copy; {new Date().getFullYear()} {SITE_CONFIG.brand.name}. All
+              rights reserved.
+            </p>
+            <div className="flex flex-wrap items-center gap-4">
+              <span className="font-mono text-[11px] text-on-forest-muted/80">
+                Tangier &middot; Barcelona
+              </span>
               <a
-                href={SITE_CONFIG.contact.instagramUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-sm text-ink hover:text-lime-ink no-underline"
+                href="#top"
+                className="inline-flex items-center gap-1.5 rounded-[10px] border border-white/15 px-3 py-1.5 text-xs font-medium text-on-forest hover:border-lime hover:text-lime transition-colors no-underline"
               >
-                {SITE_CONFIG.contact.instagramHandle}
+                Back to top
+                <ArrowUp className="h-3.5 w-3.5" aria-hidden="true" />
               </a>
             </div>
           </div>
