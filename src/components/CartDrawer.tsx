@@ -36,7 +36,7 @@ interface ConfirmationState {
   orderId: string;
   totalMad: number;
   estimatedDelivery: string;
-  deliveryMode: "resend" | "dry-run";
+  deliveryMode: "resend" | "smtp" | "dry-run";
   customerEmail: string;
   customerWhatsApp: string;
   items: Array<{
@@ -659,7 +659,8 @@ export function CartDrawer() {
                   {confirmation.deliveryMode === "dry-run" && (
                     <p className="m-0 rounded-[10px] border border-water/30 bg-water/10 px-3.5 py-2.5 font-mono text-xs text-water">
                       Dev dry-run mode active: emails were logged to the server
-                      console because RESEND_API_KEY is not set.
+                      console because neither RESEND_API_KEY nor SMTP credentials
+                      are configured.
                     </p>
                   )}
                 </div>

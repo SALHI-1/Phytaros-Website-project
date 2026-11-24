@@ -6,6 +6,7 @@ import {
 } from "next/font/google";
 import { SITE_CONFIG } from "@/config/site";
 import { Providers } from "@/components/Providers";
+// @ts-expect-error CSS is processed by Next.js and has no TypeScript module declaration.
 import "./globals.css";
 
 const bricolage = Bricolage_Grotesque({

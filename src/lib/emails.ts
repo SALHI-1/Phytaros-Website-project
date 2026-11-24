@@ -1,3 +1,4 @@
+import nodemailer from "nodemailer";
 import { Resend } from "resend";
 import {
   SITE_CONFIG,
@@ -25,18 +26,165 @@ export interface PreorderEmailPayload {
   estimatedDelivery: string;
 }
 
-export type EmailDeliveryMode = "resend" | "dry-run";
+export type EmailDeliveryMode = "resend" | "smtp" | "dry-run";
+
+interface OutgoingEmail {
+  to: string;
+  replyTo?: string;
+  subject: string;
+  html: string;
+  text: string;
+}
 
 function getEmailConfig() {
-  const apiKey = process.env.RESEND_API_KEY?.trim() || "";
+  const resendApiKey = process.env.RESEND_API_KEY?.trim() || "";
+
+  // Supports both standard SMTP_* env vars and Mailtrap's Host/Port/Username/Password copy-paste format
+  const smtpHost = (process.env.SMTP_HOST || process.env.Host || "").trim();
+  const smtpPortRaw = (process.env.SMTP_PORT || process.env.Port || "2525").trim();
+  const smtpPort = Number.parseInt(smtpPortRaw, 10) || 2525;
+  const smtpUser = (process.env.SMTP_USER || process.env.Username || "").trim();
+  const smtpPass = (process.env.SMTP_PASS || process.env.Password || "").trim();
+  const hasSmtp = Boolean(smtpHost && smtpUser && smtpPass);
+
   const from =
     process.env.EMAIL_FROM?.trim() ||
-    `${SITE_CONFIG.brand.name} <onboarding@resend.dev>`;
+    `${SITE_CONFIG.brand.name} <orders@phytaros.com>`;
   const adminEmail =
     process.env.ADMIN_EMAIL?.trim() || SITE_CONFIG.contact.email;
   const forceDryRun = process.env.EMAIL_DRY_RUN === "true";
 
-  return { apiKey, from, adminEmail, forceDryRun };
+  return {
+    resendApiKey,
+    hasSmtp,
+    smtp: {
+      host: smtpHost,
+      port: smtpPort,
+      user: smtpUser,
+      pass: smtpPass,
+      isMailtrap: smtpHost.toLowerCase().includes("mailtrap"),
+    },
+    from,
+    adminEmail,
+    forceDryRun,
+  };
+}
+
+function delay(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function dispatchEmails(
+  messages: OutgoingEmail[],
+  dryRunMeta: Record<string, unknown>
+): Promise<{ mode: EmailDeliveryMode }> {
+  const config = getEmailConfig();
+
+  if (config.forceDryRun) {
+    console.info("[Phytaros Email DRY RUN]", dryRunMeta);
+    return { mode: "dry-run" };
+  }
+
+  // 1. Production priority: Resend HTTP API
+  if (config.resendApiKey) {
+    const resend = new Resend(config.resendApiKey);
+    for (let i = 0; i < messages.length; i++) {
+      const msg = messages[i];
+      const result = await resend.emails.send({
+        from: config.from,
+        to: [msg.to],
+        replyTo: msg.replyTo,
+        subject: msg.subject,
+        html: msg.html,
+        text: msg.text,
+      });
+      if (result.error) {
+        if (i === 0) {
+          throw new Error(`Email send failed: ${result.error.message}`);
+        }
+        console.error(
+          "[Phytaros] Secondary email failed (Resend):",
+          result.error
+        );
+      }
+    }
+    return { mode: "resend" };
+  }
+
+  // 2. Local dev / staging: SMTP via Nodemailer (Mailtrap Sandbox, etc.)
+  if (config.hasSmtp) {
+    const transporter = nodemailer.createTransport({
+      host: config.smtp.host,
+      port: config.smtp.port,
+      secure: config.smtp.port === 465,
+      auth: {
+        user: config.smtp.user,
+        pass: config.smtp.pass,
+      },
+    });
+
+    for (let i = 0; i < messages.length; i++) {
+      const msg = messages[i];
+      // Mailtrap Sandbox free tier throttles rapid consecutive emails
+      if (i > 0 && config.smtp.isMailtrap) {
+        await delay(3000);
+      }
+
+      let sent = false;
+      let lastError: unknown;
+
+      for (let attempt = 1; attempt <= 4; attempt++) {
+        try {
+          await transporter.sendMail({
+            from: config.from,
+            to: msg.to,
+            replyTo: msg.replyTo,
+            subject: msg.subject,
+            html: msg.html,
+            text: msg.text,
+          });
+          sent = true;
+          break;
+        } catch (err) {
+          lastError = err;
+          const errMsg = err instanceof Error ? err.message : String(err);
+          const isRateLimit =
+            errMsg.includes("550") ||
+            errMsg.toLowerCase().includes("too many emails") ||
+            errMsg.includes("421");
+
+          if (isRateLimit && attempt < 4) {
+            await delay(3500 * attempt);
+            continue;
+          }
+          break;
+        }
+      }
+
+      if (!sent) {
+        if (i === 0) {
+          throw lastError instanceof Error
+            ? lastError
+            : new Error("Failed to send admin notification email.");
+        }
+        console.error(
+          "[Phytaros] Secondary email failed (SMTP) after retries:",
+          lastError
+        );
+      }
+    }
+    return { mode: "smtp" };
+  }
+
+  // 3. No email provider configured
+  if (process.env.NODE_ENV === "production") {
+    throw new Error(
+      "Email service is not configured. Set RESEND_API_KEY or SMTP_HOST/SMTP_USER/SMTP_PASS."
+    );
+  }
+
+  console.info("[Phytaros Email DRY RUN — no provider configured]", dryRunMeta);
+  return { mode: "dry-run" };
 }
 
 function buildAdminWhatsAppLink(payload: PreorderEmailPayload): string {
@@ -52,7 +200,10 @@ function buildAdminWhatsAppLink(payload: PreorderEmailPayload): string {
   return `https://wa.me/${digits}?text=${encodeURIComponent(message)}`;
 }
 
-function buildItemsTableHtml(items: PricedPreorderItem[], totalMad: number): string {
+function buildItemsTableHtml(
+  items: PricedPreorderItem[],
+  totalMad: number
+): string {
   const rows = items
     .map(
       (item) => `
@@ -177,55 +328,38 @@ function buildCustomerPreorderHtml(payload: PreorderEmailPayload): string {
 export async function sendPreorderEmails(
   payload: PreorderEmailPayload
 ): Promise<{ mode: EmailDeliveryMode }> {
-  const { apiKey, from, adminEmail, forceDryRun } = getEmailConfig();
+  const { adminEmail } = getEmailConfig();
+  const waLink = buildAdminWhatsAppLink(payload);
+  const itemsText = payload.items
+    .map(
+      (i) =>
+        `- ${i.quantity}x ${i.product.name} (${formatPriceMad(i.lineTotalMad)})`
+    )
+    .join("\n");
 
-  if (forceDryRun || !apiKey) {
-    if (process.env.NODE_ENV === "production" && !forceDryRun) {
-      throw new Error(
-        "Email service is not configured. Set RESEND_API_KEY in Cloud Run environment variables."
-      );
-    }
-
-    console.info("[Phytaros Pre-Order DRY RUN]", {
-      orderId: payload.orderId,
-      adminEmail,
-      customerEmail: payload.customer.email,
-      totalMad: payload.totalMad,
-      whatsappLinkForAdmin: buildAdminWhatsAppLink(payload),
-    });
-    return { mode: "dry-run" };
-  }
-
-  const resend = new Resend(apiKey);
-
-  const adminResult = await resend.emails.send({
-    from,
-    to: [adminEmail],
+  const adminMsg: OutgoingEmail = {
+    to: adminEmail,
     replyTo: payload.customer.email,
     subject: `[Phytaros Pre-Order] ${payload.orderId} — ${payload.customer.fullName} (${formatPriceMad(payload.totalMad)})`,
     html: buildAdminPreorderHtml(payload),
-  });
+    text: `New Phytaros pre-order ${payload.orderId}\n\nCustomer: ${payload.customer.fullName}\nWhatsApp: ${payload.customer.whatsappPhone}\nEmail: ${payload.customer.email}\nCity: ${payload.customer.city}\nAddress: ${payload.customer.address}\n\nItems:\n${itemsText}\n\nTotal (Delivery included, COD): ${formatPriceMad(payload.totalMad)}\nConfirm on WhatsApp: ${waLink}`,
+  };
 
-  if (adminResult.error) {
-    throw new Error(`Admin notification failed: ${adminResult.error.message}`);
-  }
-
-  const customerResult = await resend.emails.send({
-    from,
-    to: [payload.customer.email],
+  const customerMsg: OutgoingEmail = {
+    to: payload.customer.email,
     replyTo: adminEmail,
     subject: `Phytaros Pre-Order Received (${payload.orderId})`,
     html: buildCustomerPreorderHtml(payload),
+    text: `Thank you, ${payload.customer.fullName}!\n\nWe received your pre-order ${payload.orderId}.\n${SITE_CONFIG.preorder.whatsappFollowUp}\n\nItems:\n${itemsText}\n\nTotal (Delivery included, Pay on delivery): ${formatPriceMad(payload.totalMad)}\nEstimated delivery: ${payload.estimatedDelivery}`,
+  };
+
+  return dispatchEmails([adminMsg, customerMsg], {
+    orderId: payload.orderId,
+    adminEmail,
+    customerEmail: payload.customer.email,
+    totalMad: payload.totalMad,
+    whatsappLinkForAdmin: waLink,
   });
-
-  if (customerResult.error) {
-    console.error(
-      "[Phytaros] Customer confirmation email failed:",
-      customerResult.error
-    );
-  }
-
-  return { mode: "resend" };
 }
 
 const INQUIRY_LABELS: Record<InquiryInput["type"], string> = {
@@ -237,26 +371,8 @@ const INQUIRY_LABELS: Record<InquiryInput["type"], string> = {
 export async function sendInquiryEmail(
   inquiry: InquiryInput
 ): Promise<{ mode: EmailDeliveryMode }> {
-  const { apiKey, from, adminEmail, forceDryRun } = getEmailConfig();
+  const { adminEmail } = getEmailConfig();
   const label = INQUIRY_LABELS[inquiry.type];
-
-  if (forceDryRun || !apiKey) {
-    if (process.env.NODE_ENV === "production" && !forceDryRun) {
-      throw new Error(
-        "Email service is not configured. Set RESEND_API_KEY in Cloud Run environment variables."
-      );
-    }
-
-    console.info("[Phytaros Inquiry DRY RUN]", {
-      type: label,
-      adminEmail,
-      fromCustomer: inquiry.email,
-      name: inquiry.fullName,
-    });
-    return { mode: "dry-run" };
-  }
-
-  const resend = new Resend(apiKey);
   const waDigits = inquiry.whatsappPhone
     ? normalizeWhatsAppDigits(inquiry.whatsappPhone)
     : "";
@@ -286,17 +402,18 @@ export async function sendInquiryEmail(
 </body>
 </html>`;
 
-  const result = await resend.emails.send({
-    from,
-    to: [adminEmail],
+  const msg: OutgoingEmail = {
+    to: adminEmail,
     replyTo: inquiry.email,
     subject: `[Phytaros ${label}] ${inquiry.fullName}`,
     html,
+    text: `Phytaros ${label}\nName: ${inquiry.fullName}\nEmail: ${inquiry.email}\nWhatsApp: ${inquiry.whatsappPhone || "-"}\nMessage: ${inquiry.message || "-"}`,
+  };
+
+  return dispatchEmails([msg], {
+    type: label,
+    adminEmail,
+    fromCustomer: inquiry.email,
+    name: inquiry.fullName,
   });
-
-  if (result.error) {
-    throw new Error(`Inquiry notification failed: ${result.error.message}`);
-  }
-
-  return { mode: "resend" };
 }
